@@ -6,5 +6,8 @@ export default defineEventHandler(async (event) => {
     return Country.parse(data);
   });
 
-  return await Countries.create(newCountry);
+  const country = await Countries.create(newCountry);
+  if (country instanceof Error) throw country;
+
+  return country;
 });

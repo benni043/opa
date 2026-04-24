@@ -64,10 +64,9 @@ function removeOrganization(i: number) {
 }
 
 async function onSubmit(event: FormSubmitEvent<Schema>) {
-  toast.add({
-    title: "Erfolg",
-    description: "Formular gesendet",
-    color: "success",
+  await $fetch("/api/country", {
+    method: "POST",
+    body: event.data,
   });
 
   console.log(event.data);
