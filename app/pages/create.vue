@@ -4,7 +4,7 @@ import type { FormSubmitEvent } from "@nuxt/ui";
 
 const languageSchema = z.object({
   name: z.string().min(1, "Name erforderlich"),
-  speakers: z.number({ invalid_type_error: "Zahl erforderlich" }),
+  speakers: z.number("Zahl erforderlich"),
 });
 
 const schema = z.object({
@@ -26,7 +26,7 @@ const schema = z.object({
 
   deathPenalty: z.boolean(),
 
-  gdpPerCapita: z.number({ invalid_type_error: "Zahl erforderlich" }),
+  gdpPerCapita: z.number("Zahl erforderlich"),
 });
 
 type Schema = z.output<typeof schema>;
@@ -179,7 +179,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 
               <div class="max-h-60 overflow-y-auto">
                 <div
-                  v-for="(org, i) in state.organizations"
+                  v-for="(_, i) in state.organizations"
                   :key="i"
                   class="flex gap-2 mt-2"
                 >

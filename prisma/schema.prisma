@@ -1,0 +1,59 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Country {
+  id Int @id @default(autoincrement())
+  country String @unique
+  countryCode String @unique
+  languageType String
+  languages CountryLanguage[]
+  organizations CountryOrganization[]
+  capital String
+  currency String
+  domain String
+  traffic String
+  deathPenalty Boolean
+  gdpPerCapita Float
+}
+
+model Language {
+  id          Int               @id @default(autoincrement())
+  name        String            @unique
+  countries   CountryLanguage[]
+}
+
+model CountryLanguage {
+  country     Country  @relation(fields: [countryId], references: [id])
+  countryId   Int
+
+  language    Language @relation(fields: [languageId], references: [id])
+  languageId  Int
+
+  speakers    Int
+
+  @@id([countryId, languageId])
+}
+
+
+model Organization {
+  id        Int                    @id @default(autoincrement())
+  name      String                 @unique
+
+  countries CountryOrganization[]
+}
+
+model CountryOrganization {
+  country     Country       @relation(fields: [countryId], references: [id])
+  countryId   Int
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  organizationId Int
+
+  @@id([countryId, organizationId])
+}
