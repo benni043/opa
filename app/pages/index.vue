@@ -40,6 +40,14 @@ async function x() {
     body: germany,
   });
 }
+
+onMounted(async () => {
+  const x = await $fetch("/api/country", {
+    method: "GET",
+  });
+
+  console.log(x);
+});
 </script>
 
 <template>

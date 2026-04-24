@@ -1,16 +1,5 @@
-import { prisma } from "~~/lib/prisma";
+import { Countries } from "#server/storage/country";
 
-export default defineEventHandler(async (event) => {
-  const allCountries = await prisma.country.findMany({
-    include: {
-      languages: {
-        include: { language: true },
-      },
-      organizations: {
-        include: { organization: true },
-      },
-    },
-  });
-
-  console.log(allCountries);
+export default defineEventHandler(async () => {
+  return Countries.getAll();
 });

@@ -3,7 +3,58 @@ import type { Country } from "#shared/types/types";
 import { prisma } from "~~/lib/prisma";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
 
+function mapCountry(c: any): Country {
+  return {
+    country: c.country,
+    countryCode: c.countryCode,
+    languageType: c.languageType,
+
+    languages: c.languages.map((l: any) => ({
+      name: l.language.name,
+      speakers: l.speakers,
+    })),
+
+    organizations: c.organizations.map((o: any) => o.organization.name),
+
+    capital: c.capital,
+    currency: c.currency,
+    domain: c.domain,
+    traffic: c.traffic,
+    deathPenalty: c.deathPenalty,
+    gdpPerCapita: c.gdpPerCapita,
+  };
+}
+
 export const Countries = {
+  async getAll(): Promise<Country[] | NuxtError> {
+    try {
+      const countryDb = await prisma.country.findMany({
+        include: {
+          languages: {
+            include: { language: true },
+          },
+          organizations: {
+            include: { organization: true },
+          },
+        },
+      });
+
+      return countryDb.map(mapCountry);
+    } catch (e) {
+      if (e instanceof PrismaClientKnownRequestError) {
+        throw createError({
+          statusCode: 400,
+          statusMessage: "Database constraint error",
+          data: e.code,
+        });
+      }
+
+      throw createError({
+        statusCode: 500,
+        statusMessage: "Internal database error",
+      });
+    }
+  },
   async create(country: Country): Promise<Country | NuxtError> {
     try {
       await prisma.country.create({
