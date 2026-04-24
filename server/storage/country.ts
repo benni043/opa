@@ -55,6 +55,46 @@ export const Countries = {
       });
     }
   },
+  async getByCountryCode(countryCode: string): Promise<Country | NuxtError> {
+    try {
+      const countryDb = await prisma.country.findUnique({
+        where: {
+          countryCode,
+        },
+        include: {
+          languages: {
+            include: { language: true },
+          },
+          organizations: {
+            include: { organization: true },
+          },
+        },
+      });
+
+      if (!countryDb) {
+        // todo tobi fragen
+        throw createError({
+          statusCode: 404,
+          statusMessage: "Country not found",
+        });
+      }
+
+      return mapCountry(countryDb);
+    } catch (e) {
+      if (e instanceof PrismaClientKnownRequestError) {
+        throw createError({
+          statusCode: 400,
+          statusMessage: "Database constraint error",
+          data: e.code,
+        });
+      }
+
+      throw createError({
+        statusCode: 500,
+        statusMessage: "Internal database error",
+      });
+    }
+  },
   async create(country: Country): Promise<Country | NuxtError> {
     try {
       await prisma.country.create({

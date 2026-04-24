@@ -42,7 +42,7 @@ async function x() {
 }
 
 onMounted(async () => {
-  const x = await $fetch("/api/country", {
+  const x = await $fetch("/api/country/getAll", {
     method: "GET",
   });
 
