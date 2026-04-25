@@ -10,5 +10,6 @@ export default withNuxt({
     "vue/comma-dangle": "off",
     "vue/singleline-html-element-content-newline": "off",
     "@stylistic/arrow-parens": "off",
+    "@typescript-eslint/no-explicit-any": "off",
   },
 });

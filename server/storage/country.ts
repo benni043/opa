@@ -27,8 +27,10 @@ function mapCountry(c: any): Country {
 
 export const Countries = {
   async getAll(): Promise<Country[] | NuxtError> {
+    let countryDb;
+
     try {
-      const countryDb = await prisma.country.findMany({
+      countryDb = await prisma.country.findMany({
         include: {
           languages: {
             include: { language: true },
@@ -38,8 +40,6 @@ export const Countries = {
           },
         },
       });
-
-      return countryDb.map(mapCountry);
     } catch (e) {
       if (e instanceof PrismaClientKnownRequestError) {
         throw createError({
@@ -54,10 +54,14 @@ export const Countries = {
         statusMessage: "Internal database error",
       });
     }
+
+    return countryDb.map(mapCountry);
   },
   async getByCountryCode(countryCode: string): Promise<Country | NuxtError> {
+    let countryDb;
+
     try {
-      const countryDb = await prisma.country.findUnique({
+      countryDb = await prisma.country.findUnique({
         where: {
           countryCode,
         },
@@ -70,16 +74,6 @@ export const Countries = {
           },
         },
       });
-
-      if (!countryDb) {
-        // todo tobi fragen
-        throw createError({
-          statusCode: 404,
-          statusMessage: "Country not found",
-        });
-      }
-
-      return mapCountry(countryDb);
     } catch (e) {
       if (e instanceof PrismaClientKnownRequestError) {
         throw createError({
@@ -94,6 +88,15 @@ export const Countries = {
         statusMessage: "Internal database error",
       });
     }
+
+    if (!countryDb) {
+      throw createError({
+        statusCode: 404,
+        statusMessage: "Country not found",
+      });
+    }
+
+    return mapCountry(countryDb);
   },
   async create(country: Country): Promise<Country | NuxtError> {
     try {

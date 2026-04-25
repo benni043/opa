@@ -45,8 +45,6 @@ const state = reactive<Schema>({
   gdpPerCapita: 0,
 });
 
-const toast = useToast();
-
 function addLanguage() {
   state.languages.push({ name: "", speakers: 0 });
 }
