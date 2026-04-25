@@ -1,57 +1,38 @@
 <script setup lang="ts">
-const germany = {
-  country: "Deutschland",
-  countryCode: "DE",
+import type { CountryListItem } from "#shared/types/types";
 
-  languageType: "Indoeuropäisch",
-
-  languages: [
-    {
-      name: "Deutsch",
-      speakers: 83000000,
-    },
-    {
-      name: "Englisch",
-      speakers: 12000000,
-    },
-    {
-      name: "Türkisch",
-      speakers: 3000000,
-    },
-  ],
-
-  organizations: ["EU", "UNO", "NATO", "G7"],
-
-  capital: "Berlin",
-  currency: "Euro",
-
-  domain: ".de",
-
-  traffic: "right",
-
-  deathPenalty: false,
-
-  gdpPerCapita: 51000,
-};
-
-async function x() {
-  await $fetch("/api/country", {
-    method: "POST",
-    body: germany,
-  });
-}
+const countries: Ref<CountryListItem[] | undefined> = ref(undefined);
 
 onMounted(async () => {
-  const x = await $fetch("/api/country/getAll", {
-    method: "GET",
-  });
-
-  console.log(x);
+  try {
+    countries.value = await $fetch("/api/country/getAll", {
+      method: "GET",
+    });
+  } catch (e) {
+    console.error(e);
+  }
 });
+
+function moreInfo(countryCode: string) {
+  navigateTo(`/${countryCode}`);
+}
+
+function add() {
+  navigateTo("/create");
+}
 </script>
 
 <template>
   <div>
-    <button @click="x()">hi</button>
+    <button @click="add()">Land hinzufügen</button>
+
+    <div v-if="countries">
+      <div v-for="country of countries" :key="country.countryCode">
+        <button @click="moreInfo(country.countryCode)">
+          {{ country.country }}
+          {{ country.countryCode }}
+        </button>
+      </div>
+    </div>
   </div>
 </template>

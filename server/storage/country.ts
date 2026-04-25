@@ -26,18 +26,12 @@ function mapCountry(c: any): Country {
 }
 
 export const Countries = {
-  async getAll(): Promise<Country[] | NuxtError> {
-    let countryDb;
-
+  async getAll(): Promise<{ country: string; countryCode: string }[]> {
     try {
-      countryDb = await prisma.country.findMany({
-        include: {
-          languages: {
-            include: { language: true },
-          },
-          organizations: {
-            include: { organization: true },
-          },
+      return await prisma.country.findMany({
+        select: {
+          country: true,
+          countryCode: true,
         },
       });
     } catch (e) {
@@ -54,8 +48,6 @@ export const Countries = {
         statusMessage: "Internal database error",
       });
     }
-
-    return countryDb.map(mapCountry);
   },
   async getByCountryCode(countryCode: string): Promise<Country | NuxtError> {
     let countryDb;

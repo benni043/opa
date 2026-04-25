@@ -28,3 +28,10 @@ export const Country = z.object({
 });
 
 export type Country = z.infer<typeof Country>;
+
+export const CountryListItem = Country.pick({
+  country: true,
+  countryCode: true,
+});
+
+export type CountryListItem = z.infer<typeof CountryListItem>;
