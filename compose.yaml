@@ -5,6 +5,8 @@ services:
       - "3013:3000"
     depends_on:
       - language_db
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@language_db:5432/${POSTGRES_DB}
     restart:
       always
 
