@@ -24,14 +24,29 @@ function add() {
 
 <template>
   <div>
-    <button @click="add()">Land hinzufügen</button>
+    <h1 class="text-center text-xl h-8 m-5 p-1.5">Übersicht</h1>
 
-    <div v-if="countries">
-      <div v-for="country of countries" :key="country.countryCode">
-        <button @click="moreInfo(country.countryCode)">
-          {{ country.country }}
-          {{ country.countryCode }}
-        </button>
+    <div class="flex justify-center flex-col">
+      <UButton variant="outline" class="mb-10 w-80 mx-auto" @click="add()">
+        Land hinzufügen
+      </UButton>
+    </div>
+
+    <div v-if="countries" class="space-y-4">
+      <div
+        v-for="country of countries"
+        :key="country.countryCode"
+        class="flex justify-center flex-col"
+      >
+        <UButton
+          variant="outline"
+          color="neutral"
+          class="w-80 mx-auto flex justify-between"
+          @click="moreInfo(country.countryCode)"
+        >
+          <span>{{ country.country }}</span>
+          <span class="opacity-60">{{ country.countryCode }}</span>
+        </UButton>
       </div>
     </div>
   </div>

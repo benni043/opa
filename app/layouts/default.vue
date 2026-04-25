@@ -2,6 +2,7 @@
 import type { ToasterProps } from "@nuxt/ui";
 
 const toaster: ToasterProps = { position: "top-right" };
+const route = useRoute();
 
 function back() {
   navigateTo("/");
@@ -10,7 +11,14 @@ function back() {
 
 <template>
   <div>
-    <button @click="back()">Zurück</button>
+    <UButton
+      v-if="route.path !== '/'"
+      class="m-5 h-8"
+      color="secondary"
+      @click="back()"
+    >
+      Zurück
+    </UButton>
 
     <main>
       <UApp :toaster="toaster">

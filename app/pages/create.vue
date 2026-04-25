@@ -11,13 +11,16 @@ const languageSchema = z.object({
 
 const schema = z.object({
   country: z.string().min(1, "Land erforderlich"),
-  countryCode: z.string().min(1, "Kürzel erforderlich"),
+  countryCode: z
+    .string()
+    .min(2, "Kürzel erforderlich")
+    .max(2, "Kürzel erforderlich"),
 
   languageType: z.string().min(1, "Sprachtyp erforderlich"),
 
   languages: z.array(languageSchema),
 
-  organizations: z.array(z.string()),
+  organizations: z.array(z.string().min(1)),
 
   capital: z.string().min(1, "Haupstadt erforderlich"),
   currency: z.string().min(1, "Währung erforderlich"),
@@ -47,6 +50,29 @@ const state = reactive<Schema>({
   gdpPerCapita: 0,
 });
 
+const canSubmit = computed(() => {
+  return schema.safeParse(state).success;
+});
+
+watch(
+  () => state.countryCode,
+  (newVal) => {
+    state.countryCode = newVal.toUpperCase().slice(0, 2);
+  },
+);
+
+watch(
+  () => state.domain,
+  (newVal) => {
+    if (!newVal.startsWith(".")) {
+      state.domain = "." + newVal.replace(/\./g, "");
+    }
+    if (newVal.length > 3) {
+      state.domain = newVal.slice(0, 3);
+    }
+  },
+);
+
 function addLanguage() {
   state.languages.push({ name: "", speakers: 0 });
 }
@@ -70,151 +96,175 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
       body: event.data,
     });
 
-    console.log(event.data);
-
     toast.add({
       title: "Erfolg",
       description: "Der Land wurde erfolgreich hinzugefügt!",
       color: "success",
       icon: "i-heroicons-check",
     });
+
+    navigateTo("/");
   } catch (error) {
-    console.log(error);
+    toast.add({
+      title: "Fehler",
+      description: "Dieses Land ist bereits vorhanden!",
+      color: "error",
+      icon: "i-heroicons-x-mark",
+    });
   }
 }
 </script>
 
 <template>
-  <div class="flex justify-center min-h-screen p-6">
-    <div class="w-full max-w-4xl">
-      <UForm :schema="schema" :state="state" @submit="onSubmit">
-        <div class="grid grid-cols-2 gap-8">
-          <!-- LEFT -->
-          <div class="space-y-4">
-            <UKbd>Wichtiges</UKbd>
+  <div>
+    <h1 class="text-3xl font-bold text-center mb-6">Land hinzufügen</h1>
 
-            <div class="flex gap-2">
-              <UFormField name="country" label="Land">
-                <UInput v-model="state.country" placeholder="Land" />
-              </UFormField>
+    <div class="flex justify-center">
+      <div class="w-full max-w-4xl">
+        <UForm :schema="schema" :state="state" @submit="onSubmit">
+          <div class="grid grid-cols-2 gap-8">
+            <!-- LEFT -->
+            <div class="space-y-4">
+              <UKbd>Wichtiges</UKbd>
 
-              <UFormField name="countryCode" label="Kürzel">
-                <UInput v-model="state.countryCode" placeholder="Kürzel" />
-              </UFormField>
-            </div>
+              <div class="flex gap-2">
+                <UFormField name="country" label="Land">
+                  <UInput v-model="state.country" placeholder="Land" />
+                </UFormField>
 
-            <div class="flex gap-2">
-              <UFormField name="capital" label="Hauptstadt">
-                <UInput v-model="state.capital" placeholder="Hauptstadt" />
-              </UFormField>
-
-              <UFormField name="domain" label="Domain">
-                <UInput v-model="state.domain" placeholder="Domain" />
-              </UFormField>
-            </div>
-
-            <UKbd>Allgemeines</UKbd>
-
-            <UFormField name="currency" label="Währung">
-              <UInput v-model="state.currency" placeholder="Währung" />
-            </UFormField>
-
-            <UFormField name="traffic" label="Verkehrsseite">
-              <USelect
-                v-model="state.traffic"
-                :items="[
-                  { label: 'Rechtsverkehr', value: 'right' },
-                  { label: 'Linksverkehr', value: 'left' },
-                ]"
-              />
-            </UFormField>
-
-            <UFormField name="deathPenalty" label="Todesstrafe">
-              <USwitch v-model="state.deathPenalty" />
-            </UFormField>
-
-            <UFormField name="gdpPerCapita" label="BIP pro Kopf">
-              <UInput v-model.number="state.gdpPerCapita" type="number" />
-            </UFormField>
-          </div>
-
-          <!-- RIGHT -->
-          <div class="space-y-4">
-            <UKbd>Sprachen</UKbd>
-
-            <UFormField name="languageType" label="Sprachtyp">
-              <UInput v-model="state.languageType" placeholder="Sprachtyp" />
-            </UFormField>
-
-            <div>
-              <div>
-                <label>Sprachen</label>
+                <UFormField name="countryCode" label="Kürzel">
+                  <UInput
+                    v-model="state.countryCode"
+                    placeholder="Kürzel"
+                    maxlength="2"
+                  />
+                </UFormField>
               </div>
 
-              <UButton size="xs" class="mt-2" @click="addLanguage">
-                + Sprache
-              </UButton>
+              <div class="flex gap-2">
+                <UFormField name="capital" label="Hauptstadt">
+                  <UInput v-model="state.capital" placeholder="Hauptstadt" />
+                </UFormField>
 
-              <div class="max-h-60 overflow-y-auto">
-                <div
-                  v-for="(lang, i) in state.languages"
-                  :key="i"
-                  class="flex gap-2 mt-2"
-                >
-                  <UInput v-model="lang.name" placeholder="Name" />
-
+                <UFormField name="domain" label="Domain">
                   <UInput
-                    v-model.number="lang.speakers"
-                    type="number"
-                    placeholder="Anzahl"
+                    v-model="state.domain"
+                    placeholder="Domain"
+                    maxlength="3"
                   />
+                </UFormField>
+              </div>
 
-                  <UButton size="xs" color="error" @click="removeLanguage(i)">
-                    X
-                  </UButton>
+              <UKbd>Allgemeines</UKbd>
+
+              <UFormField name="currency" label="Währung">
+                <UInput v-model="state.currency" placeholder="Währung" />
+              </UFormField>
+
+              <UFormField name="traffic" label="Verkehrsseite">
+                <USelect
+                  v-model="state.traffic"
+                  :items="[
+                    { label: 'Rechtsverkehr', value: 'right' },
+                    { label: 'Linksverkehr', value: 'left' },
+                  ]"
+                />
+              </UFormField>
+
+              <UFormField name="deathPenalty" label="Todesstrafe">
+                <USwitch v-model="state.deathPenalty" />
+              </UFormField>
+
+              <UFormField name="gdpPerCapita" label="BIP pro Kopf">
+                <UInput v-model.number="state.gdpPerCapita" type="number" />
+              </UFormField>
+            </div>
+
+            <!-- RIGHT -->
+            <div class="space-y-4">
+              <UKbd>Sprachen</UKbd>
+
+              <UFormField name="languageType" label="Sprachtyp">
+                <UInput v-model="state.languageType" placeholder="Sprachtyp" />
+              </UFormField>
+
+              <div>
+                <div>
+                  <label>Sprachen</label>
                 </div>
-              </div>
-            </div>
 
-            <UKbd>Organisationen</UKbd>
+                <UButton size="xs" class="mt-2" @click="addLanguage">
+                  + Sprache
+                </UButton>
 
-            <div>
-              <div>
-                <label>Organisationen</label>
-              </div>
-
-              <UButton size="xs" class="mt-2" @click="addOrganization">
-                + Organisation
-              </UButton>
-
-              <div class="max-h-60 overflow-y-auto">
-                <div
-                  v-for="(_, i) in state.organizations"
-                  :key="i"
-                  class="flex gap-2 mt-2"
-                >
-                  <UInput
-                    v-model="state.organizations[i]"
-                    :placeholder="'Organisation ' + (i + 1)"
-                  />
-
-                  <UButton
-                    size="xs"
-                    color="error"
-                    @click="removeOrganization(i)"
+                <div class="max-h-60 overflow-y-auto">
+                  <div
+                    v-for="(lang, i) in state.languages"
+                    :key="i"
+                    class="flex gap-2 mt-2"
                   >
-                    X
-                  </UButton>
+                    <UInput v-model="lang.name" placeholder="Name" />
+
+                    <UInput
+                      v-model.number="lang.speakers"
+                      type="number"
+                      placeholder="Anzahl"
+                    />
+
+                    <UButton size="xs" color="error" @click="removeLanguage(i)">
+                      X
+                    </UButton>
+                  </div>
+                </div>
+              </div>
+
+              <UKbd>Organisationen</UKbd>
+
+              <div>
+                <div>
+                  <label>Organisationen</label>
+                </div>
+
+                <UButton size="xs" class="mt-2" @click="addOrganization">
+                  + Organisation
+                </UButton>
+
+                <div class="max-h-60 overflow-y-auto">
+                  <div
+                    v-for="(_, i) in state.organizations"
+                    :key="i"
+                    class="flex gap-2 mt-2"
+                  >
+                    <UInput
+                      v-model="state.organizations[i]"
+                      :placeholder="'Organisation ' + (i + 1)"
+                    />
+
+                    <UButton
+                      size="xs"
+                      color="error"
+                      @click="removeOrganization(i)"
+                    >
+                      X
+                    </UButton>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <div class="flex justify-center">
-          <UButton size="lg" type="submit" class="mt-6"> Bestätigen </UButton>
-        </div>
-      </UForm>
+          <div class="flex justify-center">
+            <UButton
+              size="lg"
+              type="submit"
+              class="mt-6"
+              :disabled="!canSubmit"
+            >
+              Bestätigen
+            </UButton>
+          </div>
+        </UForm>
+      </div>
     </div>
   </div>
 </template>

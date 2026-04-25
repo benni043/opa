@@ -35,6 +35,8 @@ export const Countries = {
         },
       });
     } catch (e) {
+      console.error(e);
+
       if (e instanceof PrismaClientKnownRequestError) {
         throw createError({
           statusCode: 400,
@@ -67,6 +69,8 @@ export const Countries = {
         },
       });
     } catch (e) {
+      console.error(e);
+
       if (e instanceof PrismaClientKnownRequestError) {
         throw createError({
           statusCode: 400,
@@ -130,11 +134,12 @@ export const Countries = {
 
       return country;
     } catch (e) {
+      console.error(e);
+
       if (e instanceof PrismaClientKnownRequestError) {
         throw createError({
           statusCode: 400,
           statusMessage: "Database constraint error",
-          data: e.code,
         });
       }
 
