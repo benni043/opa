@@ -2,6 +2,8 @@
 import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui";
 
+const toast = useToast();
+
 const languageSchema = z.object({
   name: z.string().min(1, "Name erforderlich"),
   speakers: z.number("Zahl erforderlich"),
@@ -62,12 +64,23 @@ function removeOrganization(i: number) {
 }
 
 async function onSubmit(event: FormSubmitEvent<Schema>) {
-  await $fetch("/api/country", {
-    method: "POST",
-    body: event.data,
-  });
+  try {
+    await $fetch("/api/country", {
+      method: "POST",
+      body: event.data,
+    });
 
-  console.log(event.data);
+    console.log(event.data);
+
+    toast.add({
+      title: "Erfolg",
+      description: "Der Land wurde erfolgreich hinzugefügt!",
+      color: "success",
+      icon: "i-heroicons-check",
+    });
+  } catch (error) {
+    console.log(error);
+  }
 }
 </script>
 
