@@ -1,5 +1,5 @@
 import type { NuxtError } from "nuxt/app";
-import type { Country } from "#shared/types/types";
+import type { Country, CountryListItem } from "#shared/types/types";
 import { prisma } from "~~/lib/prisma";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
 
@@ -26,7 +26,7 @@ function mapCountry(c: any): Country {
 }
 
 export const Countries = {
-  async getAll(): Promise<{ country: string; countryCode: string }[]> {
+  async getAll(): Promise<CountryListItem[]> {
     try {
       return await prisma.country.findMany({
         select: {
@@ -93,6 +93,56 @@ export const Countries = {
     }
 
     return mapCountry(countryDb);
+  },
+  async getAllByLanguage(
+    language: string,
+  ): Promise<CountryListItem[] | NuxtError> {
+    let countryDb;
+
+    try {
+      countryDb = await prisma.country.findMany({
+        where: {
+          languages: {
+            some: {
+              language: {
+                name: {
+                  equals: language,
+                  mode: "insensitive",
+                },
+              },
+            },
+          },
+        },
+        select: {
+          country: true,
+          countryCode: true,
+        },
+      });
+    } catch (e) {
+      console.error(e);
+
+      if (e instanceof PrismaClientKnownRequestError) {
+        throw createError({
+          statusCode: 400,
+          statusMessage: "Database constraint error",
+          data: e.code,
+        });
+      }
+
+      throw createError({
+        statusCode: 500,
+        statusMessage: "Internal database error",
+      });
+    }
+
+    if (!countryDb) {
+      throw createError({
+        statusCode: 404,
+        statusMessage: "Country not found",
+      });
+    }
+
+    return countryDb;
   },
   async create(country: Country): Promise<Country | NuxtError> {
     try {
