@@ -1,18 +1,25 @@
-FROM node:20-alpine
-
+# Build stage
+FROM node:22-alpine AS build
 WORKDIR /app
 
-RUN apk add --no-cache openssl libc6-compat
+RUN corepack enable && corepack prepare pnpm@latest --activate
 
-COPY package*.json ./
-RUN npm install
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
 
 COPY . .
 
-RUN npx prisma generate
-RUN npm run build
+RUN pnpm run build
 
-ENV NITRO_PORT=3000
-ENV NITRO_HOST=0.0.0.0
+# Run stage
+FROM node:22-alpine
+WORKDIR /app
 
-CMD ["node", ".output/server/index.mjs"]
+COPY --from=build /app/.output /app/.output
+COPY --from=build /app/drizzle.config.ts /app/drizzle.config.ts
+COPY --from=build /app/server/database /app/server/database
+
+EXPOSE 3000
+
+RUN npm install drizzle-orm drizzle-kit @libsql/client
+CMD ["sh", "-c", "npx drizzle-kit migrate && node .output/server/index.mjs"]
