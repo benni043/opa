@@ -1,93 +1,81 @@
 import {
-  pgTable,
-  text,
-  serial,
-  integer,
-  boolean,
-  doublePrecision,
-  uniqueIndex,
-  primaryKey,
-} from "drizzle-orm/pg-core";
+	integer,
+	primaryKey,
+	real,
+	sqliteTable,
+	text,
+	uniqueIndex,
+} from "drizzle-orm/sqlite-core";
 
-export const countries = pgTable(
-  "countries",
-  {
-    id: serial("id").primaryKey(),
+export const countries = sqliteTable(
+	"countries",
+	{
+		id: integer("id").primaryKey({ autoIncrement: true }),
 
-    country: text("country").notNull(),
-    countryCode: text("country_code").notNull(),
+		country: text("country").notNull(),
+		countryCode: text("country_code").notNull(),
 
-    languageType: text("language_type").notNull(),
+		languageType: text("language_type").notNull(),
 
-    capital: text("capital").notNull(),
-    currency: text("currency").notNull(),
-    domain: text("domain").notNull(),
-    traffic: text("traffic").notNull(),
+		capital: text("capital").notNull(),
+		currency: text("currency").notNull(),
+		domain: text("domain").notNull(),
+		traffic: text("traffic").notNull(),
 
-    deathPenalty: boolean("death_penalty").notNull(),
+		deathPenalty: integer("death_penalty", { mode: "boolean" }).notNull(),
 
-    gdpPerCapita: doublePrecision("gdp_per_capita").notNull(),
-  },
-  (t) => ({
-    countryUnique: uniqueIndex("countries_country_unique").on(t.country),
-    countryCodeUnique: uniqueIndex("countries_country_code_unique").on(
-      t.countryCode,
-    ),
-  }),
+		gdpPerCapita: real("gdp_per_capita").notNull(),
+	},
+	(t) => [
+		uniqueIndex("countries_country_unique").on(t.country),
+		uniqueIndex("countries_country_code_unique").on(t.countryCode),
+	],
 );
 
-export const languages = pgTable(
-  "languages",
-  {
-    id: serial("id").primaryKey(),
-    name: text("name").notNull(),
-  },
-  (t) => ({
-    nameUnique: uniqueIndex("languages_name_unique").on(t.name),
-  }),
+export const languages = sqliteTable(
+	"languages",
+	{
+		id: integer("id").primaryKey({ autoIncrement: true }),
+		name: text("name").notNull(),
+	},
+	(t) => [uniqueIndex("languages_name_unique").on(t.name)],
 );
 
-export const countryLanguages = pgTable(
-  "country_languages",
-  {
-    countryId: integer("country_id")
-      .notNull()
-      .references(() => countries.id),
+export const countryLanguages = sqliteTable(
+	"country_languages",
+	{
+		countryId: integer("country_id")
+			.notNull()
+			.references(() => countries.id),
 
-    languageId: integer("language_id")
-      .notNull()
-      .references(() => languages.id),
+		languageId: integer("language_id")
+			.notNull()
+			.references(() => languages.id),
 
-    speakers: integer("speakers").notNull(),
-  },
-  (t) => ({
-    pk: primaryKey({ columns: [t.countryId, t.languageId] }),
-  }),
+		speakers: integer("speakers").notNull(),
+	},
+	(t) => [primaryKey({ columns: [t.countryId, t.languageId] })],
 );
 
-export const organizations = pgTable(
-  "organizations",
-  {
-    id: serial("id").primaryKey(),
-    name: text("name").notNull(),
-  },
-  (t) => ({
-    nameUnique: uniqueIndex("organizations_name_unique").on(t.name),
-  }),
+export const organizations = sqliteTable(
+	"organizations",
+	{
+		id: integer("id").primaryKey({ autoIncrement: true }),
+		name: text("name").notNull(),
+	},
+	(t) => [uniqueIndex("organizations_name_unique").on(t.name)],
 );
 
-export const countryOrganizations = pgTable(
-  "country_organizations",
-  {
-    countryId: integer("country_id")
-      .notNull()
-      .references(() => countries.id),
+export const countryOrganizations = sqliteTable(
+	"country_organizations",
+	{
+		countryId: integer("country_id")
+			.notNull()
+			.references(() => countries.id),
 
-    organizationId: integer("organization_id")
-      .notNull()
-      .references(() => organizations.id),
-  },
-  (t) => ({
-    pk: primaryKey({ columns: [t.countryId, t.organizationId] }),
-  }),
+		organizationId: integer("organization_id")
+			.notNull()
+			.references(() => organizations.id),
+	},
+	(t) => [primaryKey({ columns: [t.countryId, t.organizationId] })],
 );
