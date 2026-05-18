@@ -1,7 +1,5 @@
 import type { NuxtError } from "nuxt/app";
 import type { Country, CountryListItem } from "#shared/types/types";
-import { prisma } from "~~/lib/prisma";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
 
 function mapCountry(c: any): Country {
   return {
@@ -28,22 +26,23 @@ function mapCountry(c: any): Country {
 export const Countries = {
   async getAll(): Promise<CountryListItem[]> {
     try {
-      return await prisma.country.findMany({
-        select: {
-          country: true,
-          countryCode: true,
-        },
-      });
+      return [];
+      // return await prisma.country.findMany({
+      //   select: {
+      //     country: true,
+      //     countryCode: true,
+      //   },
+      // });
     } catch (e) {
       console.error(e);
 
-      if (e instanceof PrismaClientKnownRequestError) {
-        throw createError({
-          statusCode: 400,
-          statusMessage: "Database constraint error",
-          data: e.code,
-        });
-      }
+      // if (e instanceof PrismaClientKnownRequestError) {
+      //   throw createError({
+      //     statusCode: 400,
+      //     statusMessage: "Database constraint error",
+      //     data: e.code,
+      //   });
+      // }
 
       throw createError({
         statusCode: 500,
@@ -55,29 +54,29 @@ export const Countries = {
     let countryDb;
 
     try {
-      countryDb = await prisma.country.findUnique({
-        where: {
-          countryCode,
-        },
-        include: {
-          languages: {
-            include: { language: true },
-          },
-          organizations: {
-            include: { organization: true },
-          },
-        },
-      });
+      // countryDb = await prisma.country.findUnique({
+      //   where: {
+      //     countryCode,
+      //   },
+      //   include: {
+      //     languages: {
+      //       include: { language: true },
+      //     },
+      //     organizations: {
+      //       include: { organization: true },
+      //     },
+      //   },
+      // });
     } catch (e) {
       console.error(e);
 
-      if (e instanceof PrismaClientKnownRequestError) {
-        throw createError({
-          statusCode: 400,
-          statusMessage: "Database constraint error",
-          data: e.code,
-        });
-      }
+      // if (e instanceof PrismaClientKnownRequestError) {
+      //   throw createError({
+      //     statusCode: 400,
+      //     statusMessage: "Database constraint error",
+      //     data: e.code,
+      //   });
+      // }
 
       throw createError({
         statusCode: 500,
@@ -100,34 +99,34 @@ export const Countries = {
     let countryDb;
 
     try {
-      countryDb = await prisma.country.findMany({
-        where: {
-          languages: {
-            some: {
-              language: {
-                name: {
-                  equals: language,
-                  mode: "insensitive",
-                },
-              },
-            },
-          },
-        },
-        select: {
-          country: true,
-          countryCode: true,
-        },
-      });
+      // countryDb = await prisma.country.findMany({
+      //   where: {
+      //     languages: {
+      //       some: {
+      //         language: {
+      //           name: {
+      //             equals: language,
+      //             mode: "insensitive",
+      //           },
+      //         },
+      //       },
+      //     },
+      //   },
+      //   select: {
+      //     country: true,
+      //     countryCode: true,
+      //   },
+      // });
     } catch (e) {
       console.error(e);
 
-      if (e instanceof PrismaClientKnownRequestError) {
-        throw createError({
-          statusCode: 400,
-          statusMessage: "Database constraint error",
-          data: e.code,
-        });
-      }
+      // if (e instanceof PrismaClientKnownRequestError) {
+      //   throw createError({
+      //     statusCode: 400,
+      //     statusMessage: "Database constraint error",
+      //     data: e.code,
+      //   });
+      // }
 
       throw createError({
         statusCode: 500,
@@ -146,52 +145,52 @@ export const Countries = {
   },
   async create(country: Country): Promise<Country | NuxtError> {
     try {
-      await prisma.country.create({
-        data: {
-          country: country.country,
-          countryCode: country.countryCode,
-          languageType: country.languageType,
-          languages: {
-            create: country.languages.map((l) => ({
-              speakers: l.speakers,
-              language: {
-                connectOrCreate: {
-                  where: { name: l.name },
-                  create: { name: l.name },
-                },
-              },
-            })),
-          },
+      // await prisma.country.create({
+      //   data: {
+      //     country: country.country,
+      //     countryCode: country.countryCode,
+      //     languageType: country.languageType,
+      //     languages: {
+      //       create: country.languages.map((l) => ({
+      //         speakers: l.speakers,
+      //         language: {
+      //           connectOrCreate: {
+      //             where: { name: l.name },
+      //             create: { name: l.name },
+      //           },
+      //         },
+      //       })),
+      //     },
 
-          organizations: {
-            create: country.organizations.map((o) => ({
-              organization: {
-                connectOrCreate: {
-                  where: { name: o },
-                  create: { name: o },
-                },
-              },
-            })),
-          },
-          capital: country.capital,
-          currency: country.currency,
-          domain: country.domain,
-          traffic: country.traffic,
-          deathPenalty: country.deathPenalty,
-          gdpPerCapita: country.gdpPerCapita,
-        },
-      });
+      //     organizations: {
+      //       create: country.organizations.map((o) => ({
+      //         organization: {
+      //           connectOrCreate: {
+      //             where: { name: o },
+      //             create: { name: o },
+      //           },
+      //         },
+      //       })),
+      //     },
+      //     capital: country.capital,
+      //     currency: country.currency,
+      //     domain: country.domain,
+      //     traffic: country.traffic,
+      //     deathPenalty: country.deathPenalty,
+      //     gdpPerCapita: country.gdpPerCapita,
+      //   },
+      // });
 
       return country;
     } catch (e) {
       console.error(e);
 
-      if (e instanceof PrismaClientKnownRequestError) {
-        throw createError({
-          statusCode: 400,
-          statusMessage: "Database constraint error",
-        });
-      }
+      // if (e instanceof PrismaClientKnownRequestError) {
+      //   throw createError({
+      //     statusCode: 400,
+      //     statusMessage: "Database constraint error",
+      //   });
+      // }
 
       throw createError({
         statusCode: 500,
