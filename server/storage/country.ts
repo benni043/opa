@@ -137,44 +137,35 @@ export const Countries = {
       });
     }
 
-    console.log(countryDb);
-
-    return mapCountry(countryDb);
+    return mapCountry(countryDb)!;
   },
   async getAllByLanguage(
     language: string,
   ): Promise<CountryListItem[] | NuxtError> {
+    if (!language) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: "Missing language",
+      });
+    }
+
     let countryDb;
 
     try {
-      // countryDb = await prisma.country.findMany({
-      //   where: {
-      //     languages: {
-      //       some: {
-      //         language: {
-      //           name: {
-      //             equals: language,
-      //             mode: "insensitive",
-      //           },
-      //         },
-      //       },
-      //     },
-      //   },
-      //   select: {
-      //     country: true,
-      //     countryCode: true,
-      //   },
-      // });
+      countryDb = await useDrizzle()
+        .select({
+          country: countries.country,
+          countryCode: countries.countryCode,
+        })
+        .from(countries)
+        .leftJoin(
+          countryLanguages,
+          eq(countryLanguages.countryId, countries.id),
+        )
+        .leftJoin(languages, eq(languages.id, countryLanguages.languageId))
+        .where(eq(languages.name, language));
     } catch (e) {
       console.error(e);
-
-      // if (e instanceof PrismaClientKnownRequestError) {
-      //   throw createError({
-      //     statusCode: 400,
-      //     statusMessage: "Database constraint error",
-      //     data: e.code,
-      //   });
-      // }
 
       throw createError({
         statusCode: 500,

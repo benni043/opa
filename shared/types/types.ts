@@ -12,6 +12,7 @@ const organizationSchema = z.object({
 });
 
 export const Country = z.object({
+  id: z.number(),
   country: z.string().min(1),
   countryCode: z.string().min(1),
 
