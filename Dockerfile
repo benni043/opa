@@ -6,9 +6,7 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 
 COPY package.json pnpm-lock.yaml ./
 
-# Tell pnpm to allow build scripts, then install
-RUN pnpm config set only-built-dependencies --json '[]' && \
-    pnpm install --frozen-lockfile
+RUN echo "only-built-dependencies=[]" >> .npmrc && pnpm install --frozen-lockfile
 
 COPY . .
 RUN pnpm run build
