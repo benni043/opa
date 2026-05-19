@@ -5,11 +5,12 @@ WORKDIR /app
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
 COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile --config.minimumReleaseAge=0 \
- && pnpm approve-builds --all --yes
+
+# Tell pnpm to allow build scripts, then install
+RUN pnpm config set only-built-dependencies --json '[]' && \
+    pnpm install --frozen-lockfile
 
 COPY . .
-
 RUN pnpm run build
 
 # Run stage
