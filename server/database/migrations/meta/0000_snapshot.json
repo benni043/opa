@@ -1,302 +1,272 @@
 {
-  "version": "6",
-  "dialect": "sqlite",
-  "id": "62fd3493-01f1-4dae-a5c4-8c4ce22b6a15",
-  "prevId": "00000000-0000-0000-0000-000000000000",
-  "tables": {
-    "countries": {
-      "name": "countries",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "integer",
-          "primaryKey": true,
-          "notNull": true,
-          "autoincrement": true
-        },
-        "country": {
-          "name": "country",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "country_code": {
-          "name": "country_code",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "language_type": {
-          "name": "language_type",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "capital": {
-          "name": "capital",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "currency": {
-          "name": "currency",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "domain": {
-          "name": "domain",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "traffic": {
-          "name": "traffic",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "death_penalty": {
-          "name": "death_penalty",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "gdp_per_capita": {
-          "name": "gdp_per_capita",
-          "type": "real",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        }
-      },
-      "indexes": {
-        "countries_country_unique": {
-          "name": "countries_country_unique",
-          "columns": [
-            "country"
-          ],
-          "isUnique": true
-        },
-        "countries_country_code_unique": {
-          "name": "countries_country_code_unique",
-          "columns": [
-            "country_code"
-          ],
-          "isUnique": true
-        }
-      },
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
-    "country_languages": {
-      "name": "country_languages",
-      "columns": {
-        "country_id": {
-          "name": "country_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "language_id": {
-          "name": "language_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "speakers": {
-          "name": "speakers",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "country_languages_country_id_countries_id_fk": {
-          "name": "country_languages_country_id_countries_id_fk",
-          "tableFrom": "country_languages",
-          "tableTo": "countries",
-          "columnsFrom": [
-            "country_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "country_languages_language_id_languages_id_fk": {
-          "name": "country_languages_language_id_languages_id_fk",
-          "tableFrom": "country_languages",
-          "tableTo": "languages",
-          "columnsFrom": [
-            "language_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {
-        "country_languages_country_id_language_id_pk": {
-          "columns": [
-            "country_id",
-            "language_id"
-          ],
-          "name": "country_languages_country_id_language_id_pk"
-        }
-      },
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
-    "country_organizations": {
-      "name": "country_organizations",
-      "columns": {
-        "country_id": {
-          "name": "country_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "organization_id": {
-          "name": "organization_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "country_organizations_country_id_countries_id_fk": {
-          "name": "country_organizations_country_id_countries_id_fk",
-          "tableFrom": "country_organizations",
-          "tableTo": "countries",
-          "columnsFrom": [
-            "country_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "country_organizations_organization_id_organizations_id_fk": {
-          "name": "country_organizations_organization_id_organizations_id_fk",
-          "tableFrom": "country_organizations",
-          "tableTo": "organizations",
-          "columnsFrom": [
-            "organization_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {
-        "country_organizations_country_id_organization_id_pk": {
-          "columns": [
-            "country_id",
-            "organization_id"
-          ],
-          "name": "country_organizations_country_id_organization_id_pk"
-        }
-      },
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
-    "languages": {
-      "name": "languages",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "integer",
-          "primaryKey": true,
-          "notNull": true,
-          "autoincrement": true
-        },
-        "name": {
-          "name": "name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        }
-      },
-      "indexes": {
-        "languages_name_unique": {
-          "name": "languages_name_unique",
-          "columns": [
-            "name"
-          ],
-          "isUnique": true
-        }
-      },
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
-    "organizations": {
-      "name": "organizations",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "integer",
-          "primaryKey": true,
-          "notNull": true,
-          "autoincrement": true
-        },
-        "name": {
-          "name": "name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        }
-      },
-      "indexes": {
-        "organizations_name_unique": {
-          "name": "organizations_name_unique",
-          "columns": [
-            "name"
-          ],
-          "isUnique": true
-        }
-      },
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    }
-  },
-  "views": {},
-  "enums": {},
-  "_meta": {
-    "schemas": {},
-    "tables": {},
-    "columns": {}
-  },
-  "internal": {
-    "indexes": {}
-  }
+	"version": "6",
+	"dialect": "sqlite",
+	"id": "62fd3493-01f1-4dae-a5c4-8c4ce22b6a15",
+	"prevId": "00000000-0000-0000-0000-000000000000",
+	"tables": {
+		"countries": {
+			"name": "countries",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "integer",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": true
+				},
+				"country": {
+					"name": "country",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"country_code": {
+					"name": "country_code",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"language_type": {
+					"name": "language_type",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"capital": {
+					"name": "capital",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"currency": {
+					"name": "currency",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"domain": {
+					"name": "domain",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"traffic": {
+					"name": "traffic",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"death_penalty": {
+					"name": "death_penalty",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"gdp_per_capita": {
+					"name": "gdp_per_capita",
+					"type": "real",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				}
+			},
+			"indexes": {
+				"countries_country_unique": {
+					"name": "countries_country_unique",
+					"columns": ["country"],
+					"isUnique": true
+				},
+				"countries_country_code_unique": {
+					"name": "countries_country_code_unique",
+					"columns": ["country_code"],
+					"isUnique": true
+				}
+			},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"country_languages": {
+			"name": "country_languages",
+			"columns": {
+				"country_id": {
+					"name": "country_id",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"language_id": {
+					"name": "language_id",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"speakers": {
+					"name": "speakers",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {
+				"country_languages_country_id_countries_id_fk": {
+					"name": "country_languages_country_id_countries_id_fk",
+					"tableFrom": "country_languages",
+					"tableTo": "countries",
+					"columnsFrom": ["country_id"],
+					"columnsTo": ["id"],
+					"onDelete": "no action",
+					"onUpdate": "no action"
+				},
+				"country_languages_language_id_languages_id_fk": {
+					"name": "country_languages_language_id_languages_id_fk",
+					"tableFrom": "country_languages",
+					"tableTo": "languages",
+					"columnsFrom": ["language_id"],
+					"columnsTo": ["id"],
+					"onDelete": "no action",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {
+				"country_languages_country_id_language_id_pk": {
+					"columns": ["country_id", "language_id"],
+					"name": "country_languages_country_id_language_id_pk"
+				}
+			},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"country_organizations": {
+			"name": "country_organizations",
+			"columns": {
+				"country_id": {
+					"name": "country_id",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"organization_id": {
+					"name": "organization_id",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {
+				"country_organizations_country_id_countries_id_fk": {
+					"name": "country_organizations_country_id_countries_id_fk",
+					"tableFrom": "country_organizations",
+					"tableTo": "countries",
+					"columnsFrom": ["country_id"],
+					"columnsTo": ["id"],
+					"onDelete": "no action",
+					"onUpdate": "no action"
+				},
+				"country_organizations_organization_id_organizations_id_fk": {
+					"name": "country_organizations_organization_id_organizations_id_fk",
+					"tableFrom": "country_organizations",
+					"tableTo": "organizations",
+					"columnsFrom": ["organization_id"],
+					"columnsTo": ["id"],
+					"onDelete": "no action",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {
+				"country_organizations_country_id_organization_id_pk": {
+					"columns": ["country_id", "organization_id"],
+					"name": "country_organizations_country_id_organization_id_pk"
+				}
+			},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"languages": {
+			"name": "languages",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "integer",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": true
+				},
+				"name": {
+					"name": "name",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				}
+			},
+			"indexes": {
+				"languages_name_unique": {
+					"name": "languages_name_unique",
+					"columns": ["name"],
+					"isUnique": true
+				}
+			},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
+		"organizations": {
+			"name": "organizations",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "integer",
+					"primaryKey": true,
+					"notNull": true,
+					"autoincrement": true
+				},
+				"name": {
+					"name": "name",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				}
+			},
+			"indexes": {
+				"organizations_name_unique": {
+					"name": "organizations_name_unique",
+					"columns": ["name"],
+					"isUnique": true
+				}
+			},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		}
+	},
+	"views": {},
+	"enums": {},
+	"_meta": {
+		"schemas": {},
+		"tables": {},
+		"columns": {}
+	},
+	"internal": {
+		"indexes": {}
+	}
 }

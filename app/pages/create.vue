@@ -65,7 +65,7 @@
 		() => state.domain,
 		(newVal) => {
 			if (!newVal.startsWith(".")) {
-				state.domain = "." + newVal.replace(/\./g, "");
+				state.domain = `.${newVal.replace(/\./g, "")}`;
 			}
 			if (newVal.length > 3) {
 				state.domain = newVal.slice(0, 3);
@@ -104,7 +104,7 @@
 			});
 
 			navigateTo("/");
-		} catch (error) {
+		} catch {
 			toast.add({
 				title: "Fehler",
 				description: "Dieses Land ist bereits vorhanden!",
@@ -237,7 +237,7 @@
 									>
 										<UInput
 											v-model="state.organizations[i]"
-											:placeholder="'Organisation ' + (i + 1)"
+											:placeholder="`Organisation ${i + 1}`"
 										/>
 
 										<UButton
