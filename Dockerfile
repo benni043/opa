@@ -5,8 +5,8 @@ WORKDIR /app
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
 COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile --config.minimumReleaseAge=0
-RUN pnpm approve-builds
+RUN pnpm install --frozen-lockfile --config.minimumReleaseAge=0 \
+ && pnpm approve-builds --all --yes
 
 COPY . .
 
