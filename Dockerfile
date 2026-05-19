@@ -5,10 +5,10 @@ WORKDIR /app
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
 COPY package.json pnpm-lock.yaml ./
-
-RUN echo "only-built-dependencies=[]" >> .npmrc && pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile
 
 COPY . .
+
 RUN pnpm run build
 
 # Run stage
