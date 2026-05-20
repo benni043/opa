@@ -1,41 +1,68 @@
 import { z } from "zod";
 
 const languageSchema = z.object({
-  name: z.string().min(1),
-  speakers: z.number(),
+	name: z.string().min(1),
+	speakers: z.number(),
 });
+
+export type Language = z.infer<typeof languageSchema>;
 
 const organizationSchema = z.object({
-  name: z.string().min(1),
+	name: z.string().min(1),
 });
 
-export const Country = z.object({
-  country: z.string().min(1),
-  countryCode: z.string().min(1),
+export type Organization = z.infer<typeof organizationSchema>;
 
-  languageType: z.string().min(1),
+export const countrySchema = z.object({
+	country: z.string().min(1),
+	countryCode: z.string().min(1),
 
-  languages: z.array(languageSchema),
+	languageType: z.string().min(1),
 
-  organizations: z.array(organizationSchema),
+	languages: z.array(languageSchema),
 
-  capital: z.string().min(1),
-  currency: z.string().min(1),
+	organizations: z.array(organizationSchema),
 
-  domain: z.string().regex(/^\.[a-z]{2}$/),
+	capital: z.string().min(1),
+	currency: z.string().min(1),
 
-  traffic: z.string().min(1),
+	domain: z.string().regex(/^\.[a-z]{2}$/),
 
-  deathPenalty: z.boolean(),
+	traffic: z.string().min(1),
 
-  gdpPerCapita: z.number(),
+	deathPenalty: z.boolean(),
+
+	gdpPerCapita: z.number(),
 });
 
-export type Country = z.infer<typeof Country>;
+export type Country = z.infer<typeof countrySchema>;
 
-export const CountryListItem = Country.pick({
-  country: true,
-  countryCode: true,
+export type CountryRow = {
+	id: number;
+
+	country: string;
+	countryCode: string;
+	languageType: string;
+
+	capital: string;
+	currency: string;
+	domain: string;
+	traffic: string;
+
+	deathPenalty: boolean;
+	gdpPerCapita: number;
+
+	languageId: number | null;
+	languageName: string | null;
+	speakers: number | null;
+
+	organizationId: number | null;
+	organizationName: string | null;
+};
+
+export const CountryListItem = countrySchema.pick({
+	country: true,
+	countryCode: true,
 });
 
 export type CountryListItem = z.infer<typeof CountryListItem>;
