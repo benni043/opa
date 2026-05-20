@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
     return countrySchema.parse(data);
   });
 
-  const country = await Countries.create(newCountry);
+  const country = await Countries.update(newCountry);
   if (country instanceof Error) throw country;
 
   return country;
