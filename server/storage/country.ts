@@ -180,12 +180,10 @@ export const Countries = {
     return countryDb;
   },
   async create(country: Country): Promise<Country | NuxtError> {
-    console.log(3);
-    console.log(country);
     try {
       await useDrizzle().transaction(async (tx) => {
-        console.log(4);
-        const countryDb = await tx
+        // create country
+        const [countryDb] = await tx
           .insert(countries)
           .values({
             country: country.country,
@@ -199,54 +197,72 @@ export const Countries = {
             gdpPerCapita: country.gdpPerCapita,
           })
           .returning({ id: countries.id });
-        console.log(5);
 
-        const languageDb = await tx
+        // create missing languages
+        await tx
           .insert(languages)
           .values(
             country.languages.map((l) => ({
               name: l.name,
+            })),
+          )
+          .onConflictDoNothing();
+
+        // get language ids
+        const languageDb = await tx
+          .select({
+            id: languages.id,
+            name: languages.name,
+          })
+          .from(languages);
+
+        const languageMap = new Map(languageDb.map((l) => [l.name, l.id]));
+
+        // create country-language relations
+        await tx
+          .insert(countryLanguages)
+          .values(
+            country.languages.map((l) => ({
+              countryId: countryDb!.id,
+              languageId: languageMap.get(l.name)!,
               speakers: l.speakers,
             })),
           )
-          .onConflictDoNothing()
-          .returning({ id: languages.id });
-        console.log(6);
+          .onConflictDoNothing();
 
-        const organizationDb = await tx
+        // create missing organizations
+        await tx
           .insert(organizations)
           .values(
             country.organizations.map((o) => ({
               name: o.name,
             })),
           )
-          .onConflictDoNothing()
-          .returning({ id: organizations.id });
-        console.log(7);
-
-        const countryLanguagesDb = await tx
-          .insert(countryLanguages)
-          .values(
-            languageDb.map((l) => ({
-              countryId: countryDb[0]!.id,
-              languageId: l.id,
-              speakers: 0,
-            })),
-          )
           .onConflictDoNothing();
-        console.log(8);
 
-        const countryOrganizationsDb = await tx
+        // get organization ids
+        const organizationDb = await tx
+          .select({
+            id: organizations.id,
+            name: organizations.name,
+          })
+          .from(organizations);
+
+        const organizationMap = new Map(
+          organizationDb.map((o) => [o.name, o.id]),
+        );
+
+        // create country-organization relations
+        await tx
           .insert(countryOrganizations)
           .values(
-            organizationDb.map((o) => ({
-              countryId: countryDb[0]!.id,
-              organizationId: o.id,
+            country.organizations.map((o) => ({
+              countryId: countryDb!.id,
+              organizationId: organizationMap.get(o.name)!,
             })),
           )
           .onConflictDoNothing();
       });
-      console.log(9);
 
       return country;
     } catch (e) {
