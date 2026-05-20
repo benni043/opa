@@ -185,10 +185,10 @@ export const Countries = {
 
 		return countryDb;
 	},
-	async create(country: Country): Promise<Country | NuxtError> {
+	async createOrUpdate(country: Country): Promise<Country | NuxtError> {
 		try {
 			await useDrizzle().transaction(async (tx) => {
-				// create country
+				// UPSERT country
 				const [countryDb] = await tx
 					.insert(countries)
 					.values({
@@ -202,10 +202,25 @@ export const Countries = {
 						deathPenalty: country.deathPenalty,
 						gdpPerCapita: country.gdpPerCapita,
 					})
+					.onConflictDoUpdate({
+						target: countries.countryCode,
+						set: {
+							country: country.country,
+							languageType: country.languageType,
+							capital: country.capital,
+							currency: country.currency,
+							domain: country.domain,
+							traffic: country.traffic,
+							deathPenalty: country.deathPenalty,
+							gdpPerCapita: country.gdpPerCapita,
+						},
+					})
 					.returning({ id: countries.id });
 
+				const countryId = countryDb!.id;
+
+				// UPSERT languages
 				if (country.languages.length > 0) {
-					// create missing languagess
 					await tx
 						.insert(languages)
 						.values(
@@ -214,32 +229,10 @@ export const Countries = {
 							})),
 						)
 						.onConflictDoNothing();
-
-					// get language ids
-					const languageDb = await tx
-						.select({
-							id: languages.id,
-							name: languages.name,
-						})
-						.from(languages);
-
-					const languageMap = new Map(languageDb.map((l) => [l.name, l.id]));
-
-					// create country-language relations
-					await tx
-						.insert(countryLanguages)
-						.values(
-							country.languages.map((l) => ({
-								countryId: countryDb!.id,
-								languageId: languageMap.get(l.name)!,
-								speakers: l.speakers,
-							})),
-						)
-						.onConflictDoNothing();
 				}
 
+				// UPSERT organizations
 				if (country.organizations.length > 0) {
-					// create missing organizations
 					await tx
 						.insert(organizations)
 						.values(
@@ -248,29 +241,56 @@ export const Countries = {
 							})),
 						)
 						.onConflictDoNothing();
+				}
 
-					// get organization ids
-					const organizationDb = await tx
-						.select({
-							id: organizations.id,
-							name: organizations.name,
-						})
-						.from(organizations);
+				// fetch IDs (needed for pivot rebuild)
+				const languageDb = await tx
+					.select({
+						id: languages.id,
+						name: languages.name,
+					})
+					.from(languages);
 
-					const organizationMap = new Map(
-						organizationDb.map((o) => [o.name, o.id]),
+				const languageMap = new Map(languageDb.map((l) => [l.name, l.id]));
+
+				const organizationDb = await tx
+					.select({
+						id: organizations.id,
+						name: organizations.name,
+					})
+					.from(organizations);
+
+				const organizationMap = new Map(
+					organizationDb.map((o) => [o.name, o.id]),
+				);
+
+				// RECREATE pivot: country_languages
+				await tx
+					.delete(countryLanguages)
+					.where(eq(countryLanguages.countryId, countryId));
+
+				if (country.languages.length > 0) {
+					await tx.insert(countryLanguages).values(
+						country.languages.map((l) => ({
+							countryId: countryId,
+							languageId: languageMap.get(l.name)!,
+							speakers: l.speakers,
+						})),
 					);
+				}
 
-					// create country-organization relations
-					await tx
-						.insert(countryOrganizations)
-						.values(
-							country.organizations.map((o) => ({
-								countryId: countryDb!.id,
-								organizationId: organizationMap.get(o.name)!,
-							})),
-						)
-						.onConflictDoNothing();
+				// RECREATE pivot: country_organizations
+				await tx
+					.delete(countryOrganizations)
+					.where(eq(countryOrganizations.countryId, countryId));
+
+				if (country.organizations.length > 0) {
+					await tx.insert(countryOrganizations).values(
+						country.organizations.map((o) => ({
+							countryId: countryId,
+							organizationId: organizationMap.get(o.name)!,
+						})),
+					);
 				}
 			});
 
