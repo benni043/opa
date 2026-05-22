@@ -17,8 +17,12 @@ function moreInfo(countryCode: string) {
   navigateTo(`/${countryCode}`);
 }
 
-function addOrUpdate() {
+function add() {
   navigateTo("/create");
+}
+
+function edit(countryCode: string) {
+  navigateTo(`/${countryCode}/edit`);
 }
 
 async function getByLanguage(language: string) {
@@ -39,11 +43,7 @@ async function reset() {
     <h1 class="text-center text-xl h-8 m-5 p-1.5">Übersicht</h1>
 
     <div class="flex justify-center flex-col gap-2 mb-10">
-      <UButton
-        variant="outline"
-        class="mb-5 w-80 mx-auto"
-        @click="addOrUpdate('add')"
-      >
+      <UButton variant="outline" class="mb-5 w-80 mx-auto" @click="add()">
         Land hinzufügen
       </UButton>
 
@@ -81,7 +81,10 @@ async function reset() {
           <span>{{ country.country }}</span>
           <span class="opacity-60">{{ country.countryCode }}</span>
         </UButton>
-        <UButton variant="ghost" @click="addOrUpdate('update')" class="w-min"
+        <UButton
+          variant="ghost"
+          @click="edit(country.countryCode)"
+          class="w-min"
           >✏️</UButton
         >
       </div>
