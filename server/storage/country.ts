@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import type { NuxtError } from "nuxt/app";
 import {
   countries,
@@ -433,6 +433,41 @@ export const Countries = {
       return country;
     } catch (e) {
       console.log(3);
+      console.error(e);
+
+      throw createError({
+        statusCode: 500,
+        statusMessage: "Internal database error",
+      });
+    }
+  },
+  async getSpeakerCountByLanguage(
+    language: string,
+  ): Promise<{ language: string; totalSpeakers: number } | NuxtError> {
+    if (!language) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: "Missing language parameter",
+      });
+    }
+
+    try {
+      // Wir nutzen sql`sum(...)` von Drizzle, um die Sprecher zusammenzuzählen
+      const result = await useDrizzle()
+        .select({
+          totalSpeakers: sql<number>`sum(${countryLanguages.speakers})`,
+        })
+        .from(countryLanguages)
+        .leftJoin(languages, eq(languages.id, countryLanguages.languageId))
+        .where(eq(sql`lower(${languages.name})`, language.toLowerCase())); // Case-insensitive Match
+
+      const total = result[0]?.totalSpeakers ?? 0;
+
+      return {
+        language,
+        totalSpeakers: Number(total), // Sicherstellen, dass es eine JS-Zahl ist
+      };
+    } catch (e) {
       console.error(e);
 
       throw createError({
