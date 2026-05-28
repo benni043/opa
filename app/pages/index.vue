@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { CountryListItem } from "#shared/types/types";
+import type { CountryListItem, LanguageCount } from "#shared/types/types";
 
 const countries: Ref<CountryListItem[] | undefined> = ref(undefined);
 
@@ -25,10 +25,22 @@ function edit(countryCode: string) {
   navigateTo(`/${countryCode}/edit`);
 }
 
-async function getByLanguage(language: string) {
-  countries.value = await $fetch(`/api/country/getByLanguage/${language}`, {
+async function getByLanguage() {
+  const lang = prompt("Sprache eingeben:");
+
+  countries.value = await $fetch(`/api/country/getByLanguage/${lang}`, {
     method: "GET",
   });
+}
+
+async function getLanguageCount() {
+  const lang = prompt("Sprache eingeben:");
+
+  const response = await $fetch<LanguageCount>(`/api/language/${lang}`, {
+    method: "GET",
+  });
+
+  alert(`Sprachanzahl für ${response.language}: ${response.totalSpeakers}`);
 }
 
 async function reset() {
@@ -60,9 +72,18 @@ async function reset() {
         variant="outline"
         color="secondary"
         class="w-80 mx-auto"
-        @click="getByLanguage('german')"
+        @click="getByLanguage()"
       >
         Filter nach Land
+      </UButton>
+
+      <UButton
+        variant="outline"
+        color="secondary"
+        class="w-80 mx-auto"
+        @click="getLanguageCount()"
+      >
+        Sprachanzahl von Land
       </UButton>
     </div>
 

@@ -443,7 +443,7 @@ export const Countries = {
   },
   async getSpeakerCountByLanguage(
     language: string,
-  ): Promise<{ language: string; totalSpeakers: number } | NuxtError> {
+  ): Promise<LanguageCount | NuxtError> {
     if (!language) {
       throw createError({
         statusCode: 400,
