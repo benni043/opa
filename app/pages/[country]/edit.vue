@@ -1,8 +1,13 @@
 <script setup lang="ts">
 const route = useRoute();
 const { data: country } = await useFetch<Country>(
-  `/api/country/${route.params.id}`,
+  `/api/country/${route.params.country}`,
 );
+
+onMounted(() => {
+  console.log(route.params.country);
+  console.log(country.value);
+});
 </script>
 
 <template>
